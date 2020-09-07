@@ -15,72 +15,82 @@ import java.util.Collection;
 import java.util.List;
 
 import com.eviware.soapui.impl.wsdl.WsdlProject;
-import com.eviware.soapui.impl.wsdl.WsdlTestSuite;
-import com.eviware.soapui.impl.wsdl.testcase.WsdlTestCase;
-import com.eviware.soapui.impl.wsdl.testcase.WsdlTestCaseRunner;
 import com.eviware.soapui.model.support.PropertiesMap;
 import com.eviware.soapui.model.testsuite.TestCase;
+import com.eviware.soapui.model.testsuite.TestCaseRunner;
 import com.eviware.soapui.model.testsuite.TestRunner;
+import com.eviware.soapui.model.testsuite.TestSuite;
 import com.eviware.soapui.support.SoapUIException;
 
-
 public class logicaldocTest {
-	@RunWith(Parameterized.class)
-	public static class JunitTest7 {
-
-	    private String testCaseName;
-	    private static String soapuiProjectName = "C:/Users/formation/Desktop/Cours_Autom_5/Projet2_WS/Git/Project1/ProjectLogicalDoc-soapui-project.xml";
-
-	    public JunitTest7(String testCaseName) {
-	        this.testCaseName = testCaseName;
-	    }   
-
-	    @Parameters(name="{0}")
-	    public static Collection<String[] > getTestCases() throws XmlException, IOException, SoapUIException {
-	        final ArrayList<String[]>  testCases = new ArrayList<String[]>();
-	        WsdlProject soapuiProject = new WsdlProject(soapuiProjectName);
-	        WsdlTestSuite wsdlTestSuite = soapuiProject.getTestSuiteByName("TestSuite - LogicalDoc");
-	        List<TestCase> testCaseStrings = wsdlTestSuite.getTestCaseList();
-
-	        for (TestCase ts : testCaseStrings) {
-	            if (!ts.isDisabled()) {
-	                testCases.add(new String[] { ts.getName() });
-	            }
-	        }
-	        return testCases;
-	    }
-
-	    @Test
-	    public void testLogicaldoc() throws XmlException, IOException, SoapUIException {
-	        System.out.println("Nom du cas de test SoapUI : " + testCaseName);
-	        assertTrue(true);
-	        assertTrue(runSoapUITestCase(this.testCaseName));
-	    }
-
-	    public static boolean runSoapUITestCase(String testCase) throws XmlException, IOException, SoapUIException {
-	        TestRunner.Status exitValue = TestRunner.Status.INITIALIZED;
-	        WsdlProject soapuiProject = new WsdlProject(soapuiProjectName);
-            WsdlTestSuite testSuite = soapuiProject.getTestSuiteByName("TestSuite - LogicalDoc");
-	        if (testSuite == null) {
-	            System.err.println("runner soapUI, la suite de test est null : " + testSuite);
-	            return false;
-	        }
-	        WsdlTestCase soapuiTestCase = testSuite.getTestCaseByName(testCase);
-	        if (soapuiTestCase == null) {
-	            System.err.println("runner soapUI, le cas de test est null : " + testCase);
-	            return false;
-	        }
-	        soapuiTestCase.setDiscardOkResults(true);
-	        WsdlTestCaseRunner runner = soapuiTestCase.run(new PropertiesMap(), false);
-	        exitValue = runner.getStatus();
-
-	        System.out.println("cas de test soapUI fini ('" + testSuite + "':'" + testCase + "') : " + exitValue);
-	        if (exitValue == TestRunner.Status.FINISHED) {
-	            return true;
-	        } else {
-	            return false;
-	        }
-	    }
-	}
 	
+	@RunWith(Parameterized.class)
+	public class LogicalDocTest {
+		private String testCaseName;
+	
+
+		public LogicalDocTest(String testCaseName) {
+			this.testCaseName = testCaseName;
+		}
+
+		@Parameters(name = "{0}")
+		public Collection<String[]> getTestCases() throws XmlException, IOException, SoapUIException {
+			final ArrayList<String[]> testCases = new ArrayList<String[]>();
+			WsdlProject project = new WsdlProject("src/test/resources/ProjectLogicalDoc-soapui-project.xml");
+			TestSuite TS = project.getTestSuiteByName("TestSuite - LogicalDoc - PropertiesTestCase");
+			//List<TestSuite> testSuites = project.getTestSuiteList();
+			//for (TestSuite suite : testSuites) {
+				//List<TestCase> lTestCases = suite.getTestCaseList();
+				//
+			List<TestCase> TCListe = TS.getTestCaseList();
+			for (TestCase testCase : TCListe) 
+				{
+				if (!testCase.isDisabled()) 
+					{
+						testCases.add(new String[] { testCase.getName() });
+					}
+				}
+			//}
+			return testCases;
+			
+		}
+
+		@Test
+		public void testSoapUITestCase() throws XmlException, IOException, SoapUIException {
+			System.out.println("\n[START] Nom du cas de test SoapUI : " + testCaseName.toUpperCase());
+			assertTrue(true);
+			assertTrue(runSoapUITestCase(this.testCaseName));
+		}
+
+		public boolean runSoapUITestCase(String testCase) throws XmlException, IOException, SoapUIException {
+			TestRunner.Status exitValue = TestRunner.Status.INITIALIZED;
+			WsdlProject soapuiProject = new WsdlProject("src/test/resources/ProjectLogicalDoc-soapui-project.xml");
+			TestSuite TS = soapuiProject.getTestSuiteByName("TestSuite - LogicalDoc - PropertiesTestCase");
+				System.out.println("[SEARCH] recherche du TC ["+testCase+"] dans la suite "+ TS.getName().toUpperCase());
+				TestCase soapuiTestCase = TS.getTestCaseByName(testCase);
+				if (soapuiTestCase == null)
+				{
+					System.out.println("[NOT FOUND YET] runner soapUI, le cas de test [" + testCase+ "] n'est pas dans cette suite de test");
+				} 
+				else 
+				{
+					System.out.println("[RUN] Running SoapUI test [" + testCase + "]");
+					TestCaseRunner runner = soapuiTestCase.run(new PropertiesMap(), false);
+					exitValue = runner.getStatus();
+					if(exitValue == TestRunner.Status.FINISHED) 
+					{
+						System.out.println("[END] : Cas de test soapUI terminé ('" + TS.getName().toUpperCase() + "':[" + testCase + "]) : " + exitValue);
+						return true;
+					}
+				}
+
+		
+				System.out.println("[END] : Cas de test soapUI terminé ('" + TS.getName().toUpperCase() + "':[" + testCase + "]) Status : " + exitValue);
+				return false;
+			}
+		
+		
+		
+		}
+
 }
