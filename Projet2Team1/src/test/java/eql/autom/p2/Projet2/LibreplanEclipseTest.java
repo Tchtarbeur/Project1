@@ -24,12 +24,12 @@ import com.eviware.soapui.model.testsuite.TestRunner;
 import com.eviware.soapui.support.SoapUIException;
 
 
-public class libreplanTest {
+public class LibreplanEclipseTest {
 	@RunWith(Parameterized.class)
 	public static class JunitTest7 {
 
 	    private String testCaseName;
-//	    private static String soapuiProjectName = "C:/Users/formation/Desktop/Cours_Autom_5/Projet2_WS/Git/Project1/AJOUTERLEFICHIERXML"; ajouter le chemin du projet SoapUI
+	    private static String soapuiProjectName = "src/test/resources/Projet-REST-Libreplan-Eclipse.xml";
 
 	    public JunitTest7(String testCaseName) {
 	        this.testCaseName = testCaseName;
@@ -39,7 +39,7 @@ public class libreplanTest {
 	    public static Collection<String[] > getTestCases() throws XmlException, IOException, SoapUIException {
 	        final ArrayList<String[]>  testCases = new ArrayList<String[]>();
 	        WsdlProject soapuiProject = new WsdlProject(soapuiProjectName);
-//	        WsdlTestSuite wsdlTestSuite = soapuiProject.getTestSuiteByName("NOMDELATESTSUITE"); ajouter le nom de la suite de test sur SoapUI
+	        WsdlTestSuite wsdlTestSuite = soapuiProject.getTestSuiteByName("TestLibreplanEclipse");
 	        List<TestCase> testCaseStrings = wsdlTestSuite.getTestCaseList();
 
 	        for (TestCase ts : testCaseStrings) {
@@ -60,7 +60,7 @@ public class libreplanTest {
 	    public static boolean runSoapUITestCase(String testCase) throws XmlException, IOException, SoapUIException {
 	        TestRunner.Status exitValue = TestRunner.Status.INITIALIZED;
 	        WsdlProject soapuiProject = new WsdlProject(soapuiProjectName);
-//	        WsdlTestSuite testSuite = soapuiProject.getTestSuiteByName("NOMDELATESTSUITE"); ajouter le nom de la suite de test sur SoapUI
+	        WsdlTestSuite testSuite = soapuiProject.getTestSuiteByName("TestLibreplanEclipse");
 	        if (testSuite == null) {
 	            System.err.println("runner soapUI, la suite de test est null : " + testSuite);
 	            return false;
